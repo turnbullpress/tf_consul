@@ -1,8 +1,8 @@
 {
   "datacenter":"${environment}",
   "acl_datacenter":"${environment}",
-  "acl_default_policy":"allow",
-  "acl_down_policy":"allow",
+  "acl_default_policy":"deny",
+  "acl_down_policy":"deny",
   "acl_master_token":"${token}",
   "encrypt":"${encryption_key}",
   "disable_remote_exec": true,

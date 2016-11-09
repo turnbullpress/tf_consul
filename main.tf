@@ -1,5 +1,6 @@
-data "aws_vpc" "environment" {
-  id = "${var.vpc_id}"
+data "aws_subnet" "environment" {
+  vpc_id = "${var.vpc_id}"
+  id     = "${var.private_subnet_ids[2]}"
 }
 
 data "template_file" "master" {
@@ -17,18 +18,18 @@ resource "aws_instance" "server" {
   instance_type = "${var.instance_type}"
   key_name      = "${var.key_name}"
   count         = "${var.servers}"
-  subnet_id     = "${var.consul_subnet_id}"
+  subnet_id     = "${var.private_subnet_ids[2]}"
 
   vpc_security_group_ids = [
     "${aws_security_group.consul.id}",
   ]
 
   connection {
-    user         = "ubuntu"
+    user = "ubuntu"
   }
 
   tags {
-    Name = "${var.environment}-consul-${count.index}"
+    Name = "${var.environment}-consul-server-${count.index}"
   }
 
   provisioner "file" {
@@ -57,7 +58,7 @@ resource "aws_instance" "server" {
 resource "aws_security_group" "consul" {
   name        = "${var.environment}-consul"
   description = "Consul internal traffic + maintenance."
-  vpc_id      = "${data.aws_vpc.environment.id}"
+  vpc_id      = "${var.vpc_id}"
 
   ingress {
     from_port = 0
@@ -94,7 +95,7 @@ resource "aws_security_group" "consul" {
     from_port   = 8300
     to_port     = 8300
     protocol    = "tcp"
-    cidr_blocks = ["${data.aws_vpc.environment.cidr_block}"]
+    cidr_blocks = ["${data.aws_subnet.environment.cidr_block}"]
   }
 
   // allow traffic for TCP 8301 (Serf LAN)
@@ -102,7 +103,7 @@ resource "aws_security_group" "consul" {
     from_port   = 8301
     to_port     = 8301
     protocol    = "tcp"
-    cidr_blocks = ["${data.aws_vpc.environment.cidr_block}"]
+    cidr_blocks = ["${data.aws_subnet.environment.cidr_block}"]
   }
 
   // allow traffic for UDP 8301 (Serf LAN)
@@ -110,7 +111,7 @@ resource "aws_security_group" "consul" {
     from_port   = 8301
     to_port     = 8301
     protocol    = "udp"
-    cidr_blocks = ["${data.aws_vpc.environment.cidr_block}"]
+    cidr_blocks = ["${data.aws_subnet.environment.cidr_block}"]
   }
 
   // allow traffic for TCP 8400 (Consul RPC)

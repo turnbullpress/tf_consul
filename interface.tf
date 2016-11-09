@@ -15,6 +15,7 @@ variable "ami" {
     "us-east-1" = "ami-f652979b"
     "us-west-1" = "ami-7c4b331c"
   }
+
   description = "The AMIs to use for consul instances."
 }
 
@@ -27,15 +28,22 @@ variable "vpc_id" {
   description = "The VPC ID to launch in"
 }
 
-variable "servers" {
-  default = "3"
+variable "private_subnet_ids" {
+  description = "The private subnet IDs available to launch in"
 }
 
-variable "token" {}
+variable "servers" {
+  description = "Number of servers in the Consul cluster"
+  default     = "3"
+}
 
-variable "encryption_key" {}
+variable "token" {
+  description = "Consul ACL master token"
+}
 
-variable "consul_subnet_id" {}
+variable "encryption_key" {
+  description = "Consul cluster encryption key"
+}
 
 output "consul_dns_address" {
   value = "${aws_instance.server.0.public_dns}"
@@ -43,4 +51,8 @@ output "consul_dns_address" {
 
 output "consul_host_addresses" {
   value = ["${aws_instance.server.*.private_ip}"]
+}
+
+output "consul_datacenter" {
+  value = "${data.template_file.master.vars.environment}"
 }
