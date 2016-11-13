@@ -10,6 +10,10 @@ variable "key_name" {
   description = "The AWS key pair to use for resources."
 }
 
+variable "private_key_path" {
+  description = "The path to the private ssh key"
+}
+
 variable "ami" {
   default = {
     "us-east-1" = "ami-f652979b"

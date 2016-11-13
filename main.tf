@@ -26,6 +26,7 @@ resource "aws_instance" "server" {
 
   connection {
     user = "ubuntu"
+    private_key = "${file(var.private_key_path)}"
   }
 
   tags {
