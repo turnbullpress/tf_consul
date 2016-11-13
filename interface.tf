@@ -28,8 +28,8 @@ variable "vpc_id" {
   description = "The VPC ID to launch in"
 }
 
-variable "private_subnet_ids" {
-  description = "The private subnet IDs available to launch in"
+variable "public_subnet_id" {
+  description = "The public subnet ID available to launch in"
 }
 
 variable "servers" {
