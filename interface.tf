@@ -10,6 +10,10 @@ variable "key_name" {
   description = "The AWS key pair to use for resources."
 }
 
+variable "private_key_path" {
+  description = "The path to the private ssh key"
+}
+
 variable "ami" {
   default = {
     "us-east-1" = "ami-f652979b"
@@ -28,8 +32,8 @@ variable "vpc_id" {
   description = "The VPC ID to launch in"
 }
 
-variable "private_subnet_ids" {
-  description = "The private subnet IDs available to launch in"
+variable "public_subnet_id" {
+  description = "The public subnet ID available to launch in"
 }
 
 variable "servers" {

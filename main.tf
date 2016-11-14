@@ -1,6 +1,6 @@
 data "aws_subnet" "environment" {
   vpc_id = "${var.vpc_id}"
-  id     = "${var.private_subnet_ids[2]}"
+  id     = "${var.public_subnet_id}"
 }
 
 data "template_file" "master" {
@@ -18,7 +18,7 @@ resource "aws_instance" "server" {
   instance_type = "${var.instance_type}"
   key_name      = "${var.key_name}"
   count         = "${var.servers}"
-  subnet_id     = "${var.private_subnet_ids[2]}"
+  subnet_id     = "${var.public_subnet_id}"
 
   vpc_security_group_ids = [
     "${aws_security_group.consul.id}",
@@ -26,6 +26,7 @@ resource "aws_instance" "server" {
 
   connection {
     user = "ubuntu"
+    private_key = "${file(var.private_key_path)}"
   }
 
   tags {
