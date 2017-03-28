@@ -15,7 +15,7 @@ module "consul" {
   token             = "${var.token}"
   encryption_key    = "${var.encryption_key}"
   vpc_id            = "${module.vpc.vpc_id}"
-  consul_subnet_id  = "${var.consul_subnet_id}"
+  public_subnet_id  = "${var.public_subnet_id}"
   region            = "${var.region}"
   key_name          = "${var.key_name}"
 }
