@@ -54,7 +54,7 @@ output "consul_dns_address" {
 }
 
 output "consul_host_addresses" {
-  value = ["${aws_instance.server.*.private_ip}"]
+  value = "${aws_instance.server.*.private_ip}"
 }
 
 output "consul_datacenter" {
