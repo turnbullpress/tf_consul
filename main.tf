@@ -1,40 +1,42 @@
 data "aws_subnet" "environment" {
-  vpc_id = "${var.vpc_id}"
-  id     = "${var.public_subnet_id}"
+  vpc_id = var.vpc_id
+  id     = var.public_subnet_id
 }
 
 data "template_file" "master" {
-  template = "${file("${path.module}/files/master.json.tpl")}"
+  template = file("${path.module}/files/master.json.tpl")
 
-  vars {
-    environment    = "${var.environment}"
-    token          = "${var.token}"
-    encryption_key = "${var.encryption_key}"
+  vars = {
+    environment    = var.environment
+    token          = var.token
+    encryption_key = var.encryption_key
   }
 }
 
 resource "aws_instance" "server" {
-  ami           = "${lookup(var.ami, "${var.region}")}"
-  instance_type = "${var.instance_type}"
-  key_name      = "${var.key_name}"
-  count         = "${var.servers}"
-  subnet_id     = "${var.public_subnet_id}"
+  ami           = var.ami[var.region]
+  instance_type = var.instance_type
+  key_name      = var.key_name
+  count         = var.servers
+  subnet_id     = var.public_subnet_id
 
   vpc_security_group_ids = [
-    "${aws_security_group.consul.id}",
+    aws_security_group.consul.id,
   ]
 
   connection {
-    user = "ubuntu"
-    private_key = "${file(var.private_key_path)}"
+    host        = coalesce(self.public_ip, self.private_ip)
+    type        = "ssh"
+    user        = "ubuntu"
+    private_key = file(var.private_key_path)
   }
 
-  tags {
+  tags = {
     Name = "${var.environment}-consul-server-${count.index}"
   }
 
   provisioner "file" {
-    content     = "${data.template_file.master.rendered}"
+    content     = data.template_file.master.rendered
     destination = "/tmp/master.json"
   }
 
@@ -43,7 +45,7 @@ resource "aws_instance" "server" {
       "sudo mkdir -p /etc/systemd/system/consul.d",
       "sudo mv /tmp/master.json /etc/systemd/system/consul.d",
       "echo ${var.servers} > /tmp/consul-server-count",
-      "echo ${aws_instance.server.0.private_dns} > /tmp/consul-server-addr",
+      "echo ${aws_instance.server[0].private_dns} > /tmp/consul-server-addr",
     ]
   }
 
@@ -59,7 +61,7 @@ resource "aws_instance" "server" {
 resource "aws_security_group" "consul" {
   name        = "${var.environment}-consul"
   description = "Consul internal traffic + maintenance."
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port = 0
@@ -96,7 +98,7 @@ resource "aws_security_group" "consul" {
     from_port   = 8300
     to_port     = 8300
     protocol    = "tcp"
-    cidr_blocks = ["${data.aws_subnet.environment.cidr_block}"]
+    cidr_blocks = [data.aws_subnet.environment.cidr_block]
   }
 
   // allow traffic for TCP 8301 (Serf LAN)
@@ -104,7 +106,7 @@ resource "aws_security_group" "consul" {
     from_port   = 8301
     to_port     = 8301
     protocol    = "tcp"
-    cidr_blocks = ["${data.aws_subnet.environment.cidr_block}"]
+    cidr_blocks = [data.aws_subnet.environment.cidr_block]
   }
 
   // allow traffic for UDP 8301 (Serf LAN)
@@ -112,7 +114,7 @@ resource "aws_security_group" "consul" {
     from_port   = 8301
     to_port     = 8301
     protocol    = "udp"
-    cidr_blocks = ["${data.aws_subnet.environment.cidr_block}"]
+    cidr_blocks = [data.aws_subnet.environment.cidr_block]
   }
 
   // allow traffic for TCP 8400 (Consul RPC)
@@ -152,7 +154,8 @@ resource "aws_security_group" "consul" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
+  tags = {
     Name = "${var.environment}-consul-sg"
   }
 }
+
