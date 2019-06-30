@@ -27,7 +27,8 @@ CONSUL_JOIN=$(cat /tmp/consul-server-addr | tr -d '\n')
 CONSUL_SERVER_IP=$(cat /tmp/consul-server-ip | tr -d '\n')
 
 # Write the IP to host file file
-sudo echo "${CONSUL_SERVER_IP} ${CONSUL_JOIN}" >> /etc/hosts
+cp /etc/hosts /tmp/hosts
+echo "${CONSUL_SERVER_IP} ${CONSUL_JOIN}" >> /tmp/hosts
 
 # Write the flags to a temporary file
 cat >/tmp/consul_flags << EOF
@@ -58,6 +59,7 @@ sudo chown root:root /tmp/consul.service
 sudo mv /tmp/consul.service /etc/systemd/system/consul.service
 sudo chmod 0644 /etc/systemd/system/consul.service
 sudo mv /tmp/consul_flags /etc/default/consul
+sudo mv /tmp/hosts /etc/hosts 
 sudo chown root:root /etc/default/consul
 sudo chmod 0644 /etc/default/consul
 
