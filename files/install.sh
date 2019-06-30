@@ -12,7 +12,7 @@ fi
 
 
 echo "Fetching Consul..."
-CONSUL=0.7.0
+CONSUL=1.5.2
 cd /tmp
 curl https://releases.hashicorp.com/consul/${CONSUL}/consul_${CONSUL}_linux_amd64.zip -o consul.zip
 
