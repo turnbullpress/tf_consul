@@ -46,6 +46,7 @@ resource "aws_instance" "server" {
       "sudo mv /tmp/master.json /etc/systemd/system/consul.d",
       "echo ${var.servers} > /tmp/consul-server-count",
       "echo ${aws_instance.server[0].private_dns} > /tmp/consul-server-addr",
+      "echo ${aws_instance.server[0].private_up} > /tmp/consul-server-ip",
     ]
   }
 

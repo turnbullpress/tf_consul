@@ -1,6 +1,6 @@
 {
   "datacenter":"${environment}",
-  "acl_datacenter":"${environment}",
+  "primary_datacenter":"${environment}",
   "acl_default_policy":"allow",
   "acl_down_policy":"allow",
   "acl_master_token":"${token}",

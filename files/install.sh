@@ -24,6 +24,10 @@ sudo mv consul /usr/local/bin/consul
 # Read from the file we created
 SERVER_COUNT=$(cat /tmp/consul-server-count | tr -d '\n')
 CONSUL_JOIN=$(cat /tmp/consul-server-addr | tr -d '\n')
+CONSUL_SERVER_IP=$(cat /tmp/consul-server-ip | tr -d '\n')
+
+# Write the IP to host file file
+sudo echo "${CONSUL_SERVER_IP} ${CONSUL_JOIN}" >> /etc/hosts
 
 # Write the flags to a temporary file
 cat >/tmp/consul_flags << EOF
