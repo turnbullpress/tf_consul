@@ -60,8 +60,8 @@ variable "encryption_key" {
   description = "Consul cluster encryption key"
 }
 
-output "consul_dns_address" {
-  value = aws_instance.server[0].public_dns
+output "consul_dns_addresses" {
+  value = aws_instance.server[*].public_dns
 }
 
 output "consul_host_addresses" {
